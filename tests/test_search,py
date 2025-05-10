@@ -1,0 +1,34 @@
+import pytest
+from pages.home_page import HomePage
+from pages.search_page import SearchPage
+
+@pytest.mark.search
+def test_search_shows_results_for_valid_input(page):
+    home = HomePage(page)
+    home.visit("https://www.startech.com.bd/")
+    home.search_product("monitor")
+    search = SearchPage(page)
+    assert search.has_results()
+
+@pytest.mark.search
+def test_search_shows_no_results_for_invalid_input(page):
+    home = HomePage(page)
+    home.visit("https://www.startech.com.bd/")
+    home.search_product("asdjklqwe123")
+    search = SearchPage(page)
+    assert "No product found" in search.get_no_results_message()
+
+@pytest.mark.search
+def test_search_with_empty_string_redirects_or_errors(page):
+    home = HomePage(page)
+    home.visit("https://www.startech.com.bd/")
+    home.search_product("")
+    assert "search" in home.get_url().lower()
+
+@pytest.mark.search
+def test_search_with_special_characters(page):
+    home = HomePage(page)
+    home.visit("https://www.startech.com.bd/")
+    home.search_product("@#$%^&*")
+    search = SearchPage(page)
+    assert "No product found" in search.get_no_results_message()
